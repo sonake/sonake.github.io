@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Redis分布式锁 | Sonake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="java,redis,分布式锁">
+    <meta name="description" content="分布式锁一般常见的有三种实现方式: 基于数据库的乐观锁; 基于Redis的分布式锁; 基于ZooKeeper的分布式锁;这篇文章着重说一下基于redis的这种实现方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis分布式锁">
+<meta property="og:url" content="sonake.github.io&#x2F;2019&#x2F;11&#x2F;13&#x2F;Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81&#x2F;index.html">
+<meta property="og:site_name" content="Sonake">
+<meta property="og:description" content="分布式锁一般常见的有三种实现方式: 基于数据库的乐观锁; 基于Redis的分布式锁; 基于ZooKeeper的分布式锁;这篇文章着重说一下基于redis的这种实现方式">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-11-13T14:17:03.000Z">
+<meta property="article:modified_time" content="2021-10-26T01:54:52.356Z">
+<meta property="article:author" content="sonake">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="分布式锁">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="Sonake" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.1.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.JPG">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">sonake</h5>
+          <a href="mailto:y760946378@gmail.com" title="y760946378@gmail.com" class="mail">y760946378@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                时光轴
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/sonake" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://me.csdn.net/qq_41609874" target="_blank" >
+                <i class="icon icon-lg icon-bookmark"></i>
+                CSDN
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/friends"  >
+                <i class="icon icon-lg icon-unlink"></i>
+                友链
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/user" target="_blank" >
+                <i class="icon icon-lg icon-user"></i>
+                关于我
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Redis分布式锁</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="Search">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Redis分布式锁</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-13T14:17:03.000Z" itemprop="datePublished" class="page-time">
+  2019-11-13
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#分布式锁一般常见的有三种实现方式"><span class="post-toc-number">1.</span> <span class="post-toc-text">分布式锁一般常见的有三种实现方式:</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#为了保证分布式锁的可用性-需要至少保证锁的实现同时满足以下四个条件"><span class="post-toc-number">2.</span> <span class="post-toc-text">为了保证分布式锁的可用性,需要至少保证锁的实现同时满足以下四个条件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java代码实现"><span class="post-toc-number">3.</span> <span class="post-toc-text">java代码实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#实现加锁"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">实现加锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#错误示例1"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">错误示例1</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#错误示例2"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">错误示例2</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#解锁代码"><span class="post-toc-number">4.</span> <span class="post-toc-text">解锁代码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#正确姿势"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">正确姿势</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#错误示例1-1"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">错误示例1</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#错误示例2-1"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">错误示例2</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#总结"><span class="post-toc-number"></span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考阅读"><span class="post-toc-number"></span> <span class="post-toc-text">参考阅读</span></a>
+        </nav>
+    </aside>
+
+
+<article id="post-Redis分布式锁"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Redis分布式锁</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-13 14:17:03" datetime="2019-11-13T14:17:03.000Z"  itemprop="datePublished">2019-11-13</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="分布式锁一般常见的有三种实现方式"><a href="#分布式锁一般常见的有三种实现方式" class="headerlink" title="分布式锁一般常见的有三种实现方式:"></a>分布式锁一般常见的有三种实现方式:</h2><ol>
+<li>基于数据库的乐观锁;</li>
+<li>基于Redis的分布式锁;</li>
+<li>基于ZooKeeper的分布式锁;<br>这篇文章着重说一下基于redis的这种实现方式</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="为了保证分布式锁的可用性-需要至少保证锁的实现同时满足以下四个条件"><a href="#为了保证分布式锁的可用性-需要至少保证锁的实现同时满足以下四个条件" class="headerlink" title="为了保证分布式锁的可用性,需要至少保证锁的实现同时满足以下四个条件"></a>为了保证分布式锁的可用性,需要至少保证锁的实现同时满足以下四个条件</h2><p>–互斥性:在任何时刻,只能有一个客户端拥有锁<br>–不能发生死锁:即有一个客户端在持有锁的期间崩溃而没有主动解锁,也能保证后续其他客户端能加锁<br>–具有容错性:只要大部分的Redis节点正常运行,客户端就可以加锁和解锁<br>–正确性:解铃还须系铃人,加锁和解锁必须是同一个客户端,客户端自己不能把别人加的锁给解了,加锁解锁对应同一个客户端</p>
+<h2 id="java代码实现"><a href="#java代码实现" class="headerlink" title="java代码实现"></a>java代码实现</h2><p>引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>redis.clients<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jedis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="实现加锁"><a href="#实现加锁" class="headerlink" title="实现加锁"></a>实现加锁</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisTool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String LOCK_SUCCESS = <span class="string">"OK"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String SET_IF_NOT_EXIST = <span class="string">"NX"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String SET_WITH_EXPIRE_TIME = <span class="string">"PX"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 尝试获取分布式锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jedis Redis客户端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> lockKey 锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestId 请求标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> expireTime 超期时间</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否获取成功</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">tryGetDistributedLock</span><span class="params">(Jedis jedis, String lockKey, String requestId, <span class="keyword">int</span> expireTime)</span> </span>&#123;</span><br><span class="line">        String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);</span><br><span class="line">        <span class="keyword">if</span> (LOCK_SUCCESS.equals(result)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，我们加锁就一行代码：</p>
+<p>jedis.set(String key, String value, String nxxx, String expx, int time)</p>
+<p>这个set()方法一共有五个形参：</p>
+<p>第一个为key，我们使用key来当锁，因为key是唯一的。</p>
+<p>第二个为value，我们传的是requestId，很多童鞋可能不明白，有key作为锁不就够了吗，为什么还要用到value？</p>
+<p>原因就是我们在上面讲到可靠性时，分布式锁要满足第四个条件解铃还须系铃人，通过给value赋值为requestId，我们就知道这把锁是哪个请求加的了，在解锁的时候就可以有依据。</p>
+<p>requestId可以使用UUID.randomUUID().toString()方法生成。</p>
+<p>第三个为nxxx，这个参数我们填的是NX，意思是SET IF NOT EXIST，即当key不存在时，我们进行set操作；若key已经存在，则不做任何操作；</p>
+<p>第四个为expx，这个参数我们传的是PX，意思是我们要给这个key加一个过期的设置，具体时间由第五个参数决定。</p>
+<p>第五个为time，与第四个参数相呼应，代表key的过期时间。</p>
+<p>总的来说，执行上面的set()方法就只会导致两种结果：</p>
+<p>当前没有锁（key不存在），那么就进行加锁操作，并对锁设置个有效期，同时value表示加锁的客户端。<br>已有锁存在，不做任何操作。<br>心细的童鞋就会发现了，我们的加锁代码满足我们可靠性里描述的三个条件。</p>
+<p>首先，set()加入了NX参数，可以保证如果已有key存在，则函数不会调用成功，也就是只有一个客户端能持有锁，满足互斥性。</p>
+<p>其次，由于我们对锁设置了过期时间，即使锁的持有者后续发生崩溃而没有解锁，锁也会因为到了过期时间而自动解锁（即key被删除），不会发生死锁。</p>
+<p>最后，因为我们将value赋值为requestId，代表加锁的客户端请求标识，那么在客户端在解锁的时候就可以进行校验是否是同一个客户端。</p>
+<p>由于我们只考虑Redis单机部署的场景，所以容错性我们暂不考虑。</p>
+<h3 id="错误示例1"><a href="#错误示例1" class="headerlink" title="错误示例1"></a>错误示例1</h3><p>比较常见的错误示例就是使用jedis.setnx()和jedis.expire()组合实现加锁</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">test1</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">wrongGetLock1</span><span class="params">(Jedis jedis, String lockKey, String requestId, <span class="keyword">int</span> expireTime)</span> </span>&#123; </span><br><span class="line">        Long result = jedis.setnx(lockKey, requestId);</span><br><span class="line">        <span class="keyword">if</span> (result == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// 若在这里程序突然崩溃，则无法设置过期时间，将发生死锁</span></span><br><span class="line">            jedis.expire(lockKey, expireTime);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>setnx()方法作用就是SET IF NOT EXIST，expire()方法就是给锁加一个过期时间。</p>
+<p>乍一看好像和前面的set()方法结果一样，然而由于这是两条Redis命令，不具有原子性，如果程序在执行完setnx()之后突然崩溃，导致锁没有设置过期时间。那么将会发生死锁。</p>
+<p>网上之所以有人这样实现，是因为低版本的jedis并不支持多参数的set()方法。</p>
+<h3 id="错误示例2"><a href="#错误示例2" class="headerlink" title="错误示例2"></a>错误示例2</h3><p>这一种错误示例就比较难以发现问题，而且实现也比较复杂。实现思路：使用jedis.setnx()命令实现加锁，其中key是锁，value是锁的过期时间。</p>
+<p>执行过程：</p>
+<p>1.通过setnx()方法尝试加锁，如果当前锁不存在，返回加锁成功。<br>2.如果锁已经存在则获取锁的过期时间，和当前时间比较，如果锁已经过期，则设置新的过期时间，返回加锁成功。<br>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test2</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">wrongGetLock2</span><span class="params">(Jedis jedis, String lockKey, <span class="keyword">int</span> expireTime)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">long</span> expires = System.currentTimeMillis() + expireTime;</span><br><span class="line">        String expiresStr = String.valueOf(expires);</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 如果当前锁不存在，返回加锁成功</span></span><br><span class="line">        <span class="keyword">if</span> (jedis.setnx(lockKey, expiresStr) == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 如果锁存在，获取锁的过期时间</span></span><br><span class="line">        String currentValueStr = jedis.get(lockKey);</span><br><span class="line">        <span class="keyword">if</span> (currentValueStr != <span class="keyword">null</span> &amp;&amp; Long.parseLong(currentValueStr) &lt; System.currentTimeMillis()) &#123;</span><br><span class="line">            <span class="comment">// 锁已过期，获取上一个锁的过期时间，并设置现在锁的过期时间</span></span><br><span class="line">            String oldValueStr = jedis.getSet(lockKey, expiresStr);</span><br><span class="line">            <span class="keyword">if</span> (oldValueStr != <span class="keyword">null</span> &amp;&amp; oldValueStr.equals(currentValueStr)) &#123;</span><br><span class="line">                <span class="comment">// 考虑多线程并发的情况，只有一个线程的设置值和当前值相同，它才有权利加锁</span></span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 其他情况，一律返回加锁失败</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么这段代码问题在哪里？</p>
+<ol>
+<li><p>由于是客户端自己生成过期时间，所以需要强制要求分布式下每个客户端的时间必须同步。</p>
+</li>
+<li><p>当锁过期的时候，如果多个客户端同时执行jedis.getSet()方法，那么虽然最终只有一个客户端可以加锁，但这个客户端的锁过期时间可能被其他客户端覆盖。</p>
+</li>
+<li><p>锁不具备拥有者标识，即任何客户端都可以解锁。</p>
+</li>
+</ol>
+<h2 id="解锁代码"><a href="#解锁代码" class="headerlink" title="解锁代码"></a>解锁代码</h2><h3 id="正确姿势"><a href="#正确姿势" class="headerlink" title="正确姿势"></a>正确姿势</h3><p>还是先展示代码，再带大家慢慢解释为什么这样实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisTool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Long RELEASE_SUCCESS = <span class="number">1L</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 释放分布式锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jedis Redis客户端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> lockKey 锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestId 请求标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否释放成功</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">releaseDistributedLock</span><span class="params">(Jedis jedis, String lockKey, String requestId)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        String script = <span class="string">"if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end"</span>;</span><br><span class="line">        Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (RELEASE_SUCCESS.equals(result)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们解锁只需要两行代码就搞定了！</p>
+<p>第一行代码，我们写了一个简单的Lua脚本代码。</p>
+<p>第二行代码，我们将Lua代码传到jedis.eval()方法里，并使参数KEYS[1]赋值为lockKey，ARGV[1]赋值为requestId。eval()方法是将Lua代码交给Redis服务端执行。</p>
+<p>那么这段Lua代码的功能是什么呢？</p>
+<p>其实很简单，首先获取锁对应的value值，检查是否与requestId相等，如果相等则删除锁（解锁）。</p>
+<p>那么为什么要使用Lua语言来实现呢？</p>
+<p>因为要确保上述操作是原子性的。关于非原子性会带来什么问题，可以阅读【解锁代码-错误示例2】</p>
+<p>那么为什么执行eval()方法可以确保原子性，源于Redis的特性，下面是官网对eval命令的部分解释：</p>
+<p>简单来说，就是在eval命令执行Lua代码的时候，Lua代码将被当成一个命令去执行，并且直到eval命令执行完成，Redis才会执行其他命令。</p>
+<h3 id="错误示例1-1"><a href="#错误示例1-1" class="headerlink" title="错误示例1"></a>错误示例1</h3><p>最常见的解锁代码就是直接使用jedis.del()方法删除锁，这种不先判断锁的拥有者而直接解锁的方式，会导致任何客户端都可以随时进行解锁，即使这把锁不是它的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisTool</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> jedis</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> lockKey</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">wrongReleaseLock1</span><span class="params">(Jedis jedis, String lockKey)</span> </span>&#123;</span><br><span class="line">        jedis.del(lockKey);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="错误示例2-1"><a href="#错误示例2-1" class="headerlink" title="错误示例2"></a>错误示例2</h3><p>这种解锁代码乍一看也是没问题，甚至我之前也差点这样实现，与正确姿势差不多，唯一区别的是分成两条命令去执行</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisTool</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> jedis</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> lockKey</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> requestId</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">wrongReleaseLock2</span><span class="params">(Jedis jedis, String lockKey, String requestId)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 判断加锁与解锁是不是同一个客户端</span></span><br><span class="line">        <span class="keyword">if</span> (requestId.equals(jedis.get(lockKey))) &#123;</span><br><span class="line">            <span class="comment">// 若在此时，这把锁突然不是这个客户端的，则会误解锁</span></span><br><span class="line">            jedis.del(lockKey);</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如代码注释，问题在于如果调用jedis.del()方法的时候，这把锁已经不属于当前客户端的时候会解除他人加的锁。</p>
+<p>那么是否真的有这种场景？</p>
+<p>答案是肯定的，比如客户端A加锁，一段时间之后客户端A解锁，在执行jedis.del()之前，锁突然过期了，此时客户端B尝试加锁成功，然后客户端A再执行del()方法，则将客户端B的锁给解除了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文主要介绍了如何使用Java代码正确实现Redis分布式锁，对于加锁和解锁也分别给出了两个比较经典的错误示例。</p>
+<p>其实想要通过Redis实现分布式锁并不难，只要保证能满足可靠性里的四个条件。</p>
+<p>互联网虽然给我们带来了方便，只要有问题就可以google，然而网上的答案一定是对的吗？其实不然，所以我们更应该时刻保持着质疑精神，多想多验证。</p>
+<p>如果你的项目中Redis是多机部署的，那么可以尝试使用Redisson实现分布式锁，这是Redis官方提供的Java组件，链接在参考阅读章节已经给出</p>
+<h1 id="参考阅读"><a href="#参考阅读" class="headerlink" title="参考阅读"></a>参考阅读</h1><p><a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a><br><a href="https://redis.io/commands/eval" target="_blank" rel="noopener">https://redis.io/commands/eval</a><br><a href="https://github.com/redisson/redisson" target="_blank" rel="noopener">https://github.com/redisson/redisson</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    Last updated: <time datetime="2021-10-26T01:54:52.356Z" itemprop="dateUpdated">2021-10-26 01:54:52</time>
+</span><br>
+
+
+        
+        MIT License Copyright (c) 2019 xzyuan
+        
+    </div>
+    
+    <footer>
+        <a href="sonake.github.io">
+            <img src="/img/head.JPG" alt="sonake">
+            sonake
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag">分布式锁</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/&title=《Redis分布式锁》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/&title=《Redis分布式锁》 — Sonake&source=分布式锁一般常见的有三种实现方式:
+基于数据库的乐观锁;
+基于Redis的分布式锁;
+基于ZooKeeper的分布式锁;这篇文章着重说一下基于redis的..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Redis分布式锁》 — Sonake&url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/11/21/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95-%E4%B8%80/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据结构与算法(一)</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/11/13/mysql%E7%AC%94%E8%AE%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">记录一些mysql的笔记</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "2KrcWzJTj3SXESRPeMJAQudH-gzGzoHsz",
+            appKey: "uElsPl2LhgVn4yS8wNK4a6kC",
+            avatar: "mm",
+            placeholder: "大佬请讲",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/weixin.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/weixin.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>This blog is licensed under a <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>sonake &copy; 2016 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/&title=《Redis分布式锁》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/&title=《Redis分布式锁》 — Sonake&source=分布式锁一般常见的有三种实现方式:
+基于数据库的乐观锁;
+基于Redis的分布式锁;
+基于ZooKeeper的分布式锁;这篇文章着重说一下基于redis的..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Redis分布式锁》 — Sonake&url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3a0WrDQAwEwP7/T7fQp0Kxs5JOTgvjpxCc5OYK1la6j4/4+vy+fr6+v35/Nrnz6nfz+5sXHh4eXmvp9z+fvK7+VvXOfIvx8PDwnuHlxeD+ngSTF4lku19Y8PDw8N7Ku2f0Mm2+cXh4eHj/kdeL2kmMzu/Bw8PD+zu8pBlRLQ+T5ebrOdZrwcPDw+tPnQpLedfr9fkeHh4e3rhNkDdwkyB+X2yqxxQuV4uHh4e3wKtG4d44Kg/f1QgelQ08PDy8o7weo/d+NRZ/ji88PDy8bV4y3KqG3RwwGZtdbjEeHh7eg7x80DU/XlAdXBW2AA8PD2+Bl8To6oGneWjODxYkW4CHh4e3wesdZjq7EdWRW/nvhoeHh7fAyxsKyf1J8M1j92hr8PDw8BZ4kyNQ1XZDTs3buFGUx8PDwzvKS8Lr/KBA/ujvHWW4LEJ4eHh4C7zef+7J+/NGRh7co83Cw8PDG/OSxZ16lFebCHlL4kUDAg8PD+8oL4/CvSZFcmRqXjBehGk8PDy8o7zq434yyM9/q3qA4BKJh4eHt8DLp0W9cVR+f7UlUYbh4eHhHeJVO769RZ9tZOStDTw8PLxtXt6GSKJzPqzqRfmo5YGHh4e3wJt8Rb4F89Tf2wg8PDy8DV7SOOgNxvIhWe8AQTR+w8PDw1vj9Vq6c2ReDJqbgoeHh7fAq4bgHLwxPOsdxsLDw8M7y8vDdF4GTi13chQMDw8P7xleb0ifLCU/oNCrbIVeCx4eHt6YV33gVpdYbctO2ri9QoKHh4fX4+XFoAo+27yoBnQ8PDy8bV5SDJKvnlOrEbk8AMPDw8N7kNcrEnlorh5gjaoAHh4e3p/hTT6V83pB/EBhwMPDwwt4+dCrWjCSEdqp2I2Hh4f3DG8yAOtF3mpToxCgexceHh5eyvsCdk7Qdd0NNdAAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '我又出来了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!我又进去了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

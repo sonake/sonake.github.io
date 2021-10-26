@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>记录一些mysql的笔记 | Sonake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="mysql,sql进阶">
+    <meta name="description" content="mysql服务端与客户端常见的连接方式有三种：1.TCP&#x2F;IP连接,这是我们目前经常采用的方式2.命名管道和共享内存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录一些mysql的笔记">
+<meta property="og:url" content="sonake.github.io&#x2F;2019&#x2F;11&#x2F;13&#x2F;mysql%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="Sonake">
+<meta property="og:description" content="mysql服务端与客户端常见的连接方式有三种：1.TCP&#x2F;IP连接,这是我们目前经常采用的方式2.命名管道和共享内存">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;11&#x2F;13&#x2F;mysql%E7%AC%94%E8%AE%B0&#x2F;命名管道和共享内存.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;11&#x2F;13&#x2F;mysql%E7%AC%94%E8%AE%B0&#x2F;Unix域套接字文件.png">
+<meta property="article:published_time" content="2019-11-13T10:56:37.000Z">
+<meta property="article:modified_time" content="2021-10-26T01:54:52.360Z">
+<meta property="article:author" content="sonake">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="sql进阶">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="sonake.github.io&#x2F;2019&#x2F;11&#x2F;13&#x2F;mysql%E7%AC%94%E8%AE%B0&#x2F;命名管道和共享内存.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Sonake" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.1.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.JPG">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">sonake</h5>
+          <a href="mailto:y760946378@gmail.com" title="y760946378@gmail.com" class="mail">y760946378@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                时光轴
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/sonake" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://me.csdn.net/qq_41609874" target="_blank" >
+                <i class="icon icon-lg icon-bookmark"></i>
+                CSDN
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/friends"  >
+                <i class="icon icon-lg icon-unlink"></i>
+                友链
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/user" target="_blank" >
+                <i class="icon icon-lg icon-user"></i>
+                关于我
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">记录一些mysql的笔记</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="Search">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">记录一些mysql的笔记</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-13T10:56:37.000Z" itemprop="datePublished" class="page-time">
+  2019-11-13
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#mysql服务端与客户端常见的连接方式有三种："><span class="post-toc-number">1.</span> <span class="post-toc-text">mysql服务端与客户端常见的连接方式有三种：</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#mysql的启动连接有长短命令，最初是长命令，为了方便改为短命令"><span class="post-toc-number"></span> <span class="post-toc-text">mysql的启动连接有长短命令，最初是长命令，为了方便改为短命令</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#常见长短命令的对应关系"><span class="post-toc-number">1.</span> <span class="post-toc-text">常见长短命令的对应关系</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#mysql的命令参数优先级"><span class="post-toc-number"></span> <span class="post-toc-text">mysql的命令参数优先级</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#mysql索引的存储方式"><span class="post-toc-number"></span> <span class="post-toc-text">mysql索引的存储方式</span></a>
+        </nav>
+    </aside>
+
+
+<article id="post-mysql笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">记录一些mysql的笔记</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-13 10:56:37" datetime="2019-11-13T10:56:37.000Z"  itemprop="datePublished">2019-11-13</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="mysql服务端与客户端常见的连接方式有三种："><a href="#mysql服务端与客户端常见的连接方式有三种：" class="headerlink" title="mysql服务端与客户端常见的连接方式有三种："></a>mysql服务端与客户端常见的连接方式有三种：</h3><p>1.TCP/IP连接,这是我们目前经常采用的方式<br>2.命名管道和共享内存</p>
+<a id="more"></a>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="命名管道和共享内存.png" alt="命名管道和共享内存.png" title="">
+                </div>
+                <div class="image-caption">命名管道和共享内存.png</div>
+            </figure>
+<p>3.Unix域套接字文件</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="Unix域套接字文件.png" alt="Unix域套接字文件.png" title="">
+                </div>
+                <div class="image-caption">Unix域套接字文件.png</div>
+            </figure>
+<h2 id="mysql的启动连接有长短命令，最初是长命令，为了方便改为短命令"><a href="#mysql的启动连接有长短命令，最初是长命令，为了方便改为短命令" class="headerlink" title="mysql的启动连接有长短命令，最初是长命令，为了方便改为短命令"></a>mysql的启动连接有长短命令，最初是长命令，为了方便改为短命令</h2><h3 id="常见长短命令的对应关系"><a href="#常见长短命令的对应关系" class="headerlink" title="常见长短命令的对应关系"></a>常见长短命令的对应关系</h3><table>
+<thead>
+<tr>
+<th>参数名</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-h</td>
+<td align="center">表示服务器进程所在计算机的域名或者IP地址，如果服务器进程就运行在本机的话，可以省略这个参数，或者填localhost或者127.0.0.1。也可以写作 –host=主机名的形式</td>
+</tr>
+<tr>
+<td>-u</td>
+<td align="center">表示用户名。也可以写作 –user=用户名的形式</td>
+</tr>
+<tr>
+<td>-p</td>
+<td align="center">表示密码。也可以写作 –password=密码的形式</td>
+</tr>
+<tr>
+<td>-P</td>
+<td align="center">表示端口，也可以写作–port端口</td>
+</tr>
+<tr>
+<td>-V</td>
+<td align="center">表示版本信息，也可以写作–version</td>
+</tr>
+</tbody></table>
+<h2 id="mysql的命令参数优先级"><a href="#mysql的命令参数优先级" class="headerlink" title="mysql的命令参数优先级"></a>mysql的命令参数优先级</h2><p>不同文件的相同参数<br>   <font color=#5F9EA0 size=4>命令行指定参数&gt;my.cnf&gt;其他配置文件</font><br>同文件的相同参数<br>   <font color=#5F9EA0 size=4>以出现在最后的位置为准</font><br> <font color=#5F9EA0 size=4>defaults-extra-file</font>参数可以指定额外的配置文件搜索路径   </p>
+<h2 id="mysql索引的存储方式"><a href="#mysql索引的存储方式" class="headerlink" title="mysql索引的存储方式"></a>mysql索引的存储方式</h2><p>   mysql索引采用的存储方式为B+树</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    Last updated: <time datetime="2021-10-26T01:54:52.360Z" itemprop="dateUpdated">2021-10-26 01:54:52</time>
+</span><br>
+
+
+        
+        MIT License Copyright (c) 2019 xzyuan
+        
+    </div>
+    
+    <footer>
+        <a href="sonake.github.io">
+            <img src="/img/head.JPG" alt="sonake">
+            sonake
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sql%E8%BF%9B%E9%98%B6/" rel="tag">sql进阶</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/&title=《记录一些mysql的笔记》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/&title=《记录一些mysql的笔记》 — Sonake&source=mysql服务端与客户端常见的连接方式有三种：1.TCP/IP连接,这是我们目前经常采用的方式2.命名管道和共享内存" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《记录一些mysql的笔记》 — Sonake&url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/11/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Redis分布式锁</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">讨论下时下很热门的容器部署,先来安装docker</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "2KrcWzJTj3SXESRPeMJAQudH-gzGzoHsz",
+            appKey: "uElsPl2LhgVn4yS8wNK4a6kC",
+            avatar: "mm",
+            placeholder: "大佬请讲",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/weixin.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/weixin.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>This blog is licensed under a <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>sonake &copy; 2016 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/&title=《记录一些mysql的笔记》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/&title=《记录一些mysql的笔记》 — Sonake&source=mysql服务端与客户端常见的连接方式有三种：1.TCP/IP连接,这是我们目前经常采用的方式2.命名管道和共享内存" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《记录一些mysql的笔记》 — Sonake&url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/11/13/mysql%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKElEQVR42u3aQW4jMQwEwPz/015gTwtkYXeTkwCjKZ0Mx5GmfKBJil9f8Xr9Xe//+u/K90neuWxhYGDclvF6u75/pv3f7w+XnNXuj4GB8QTG++D4PpjuHyIhfXhmDAwMjHLrhN2ei4GBgbEJoy0jL2IxMDAw2iI2D53twyXF82W1OAYGxg0Z7cXAb77+wfsNDAyMmzBe5arTtcVXVjwVBgbG0YxZU749fpZKJqdEEx8YGBg3Z2wGLNr2WbL/8DUGBsYDGPsm2uaqIAnKH97BwMA4mjHbLmHnqWESvldjrBgYGEcw8uRvlibux78wMDAw2gZZfmS7f3upiYGB8RzGLGlrBybaoa62PYeBgXEqIw+RUR18afi+7A4WAwPjCMamiX/V+5sEEQMD4zmMJCFrD2uvIZPSNxq2wMDAOIgxu7y8thB9/wNQjKBhYGAcykhKyqvSu1mwrtttGBgYxzFmQw95a2wWdpNhi6Iix8DAOJqRh8h8wCIJ6Pl/RQEXAwPj5ox2hGuWLLZtuzZZxMDAeA5jdkkwSx83yeh/ngEDA+NoRhJG88OiUnNxzRB9HgMD4zjGq1xtgvhzBfCH3w0MDIyDGPnKGXkRm1PzNhwGBsapjFkjbPMN5RecRZDFwMB4AGPWFGtHxDZjHBgYGBibcjRv6M8K3aLphoGBgbFojeXjFzM8BgbGExh5EdteZ+ZJ5KbExcDAOJvRXgzMkrn9bisABgbGXRl/AAVM1iwJFjLqAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '我又出来了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!我又进去了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

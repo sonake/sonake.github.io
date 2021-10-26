@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>rabbitmq简单实践 | Sonake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="redis,rabbitmq,秒杀">
+    <meta name="description" content="简介AMQP，即Advanced Message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rabbitmq简单实践">
+<meta property="og:url" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;index.html">
+<meta property="og:site_name" content="Sonake">
+<meta property="og:description" content="简介AMQP，即Advanced Message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;redis持久化.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;jmeter截图1.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;jmeter截图2.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;jmeter3.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;jmeter4.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;jmeter5.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;rabbitmq1.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;rabbitmq2.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;数据库秒杀1.png">
+<meta property="og:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;数据库秒杀2.png">
+<meta property="article:published_time" content="2019-12-27T14:39:54.000Z">
+<meta property="article:modified_time" content="2021-10-26T01:54:52.360Z">
+<meta property="article:author" content="sonake">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="rabbitmq">
+<meta property="article:tag" content="秒杀">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="sonake.github.io&#x2F;2019&#x2F;12&#x2F;27&#x2F;rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5&#x2F;redis持久化.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Sonake" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.1.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.JPG">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">sonake</h5>
+          <a href="mailto:y760946378@gmail.com" title="y760946378@gmail.com" class="mail">y760946378@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                时光轴
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/sonake" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://me.csdn.net/qq_41609874" target="_blank" >
+                <i class="icon icon-lg icon-bookmark"></i>
+                CSDN
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/friends"  >
+                <i class="icon icon-lg icon-unlink"></i>
+                友链
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/user" target="_blank" >
+                <i class="icon icon-lg icon-user"></i>
+                关于我
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">rabbitmq简单实践</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="Search">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">rabbitmq简单实践</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-12-27T14:39:54.000Z" itemprop="datePublished" class="page-time">
+  2019-12-27
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">简介</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#项目地址-rabbitmq秒杀实践"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">项目地址: rabbitmq秒杀实践</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#第一步-新建springboot项目，引入依赖-增加库表"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">第一步: 新建springboot项目，引入依赖,增加库表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#第二步：添加配置"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">第二步：添加配置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#第三步：代码实现"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">第三步：代码实现</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#测试"><span class="post-toc-number">2.</span> <span class="post-toc-text">测试</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#利用压测工具jmeter模拟秒杀"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">利用压测工具jmeter模拟秒杀.</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#纯数据库秒杀"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">纯数据库秒杀</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-rabbitmq简单实践"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">rabbitmq简单实践</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-12-27 14:39:54" datetime="2019-12-27T14:39:54.000Z"  itemprop="datePublished">2019-12-27</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>AMQP，即Advanced Message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。</p>
+<a id="more"></a>
+
+<p>消息中间件主要用于组件之间的解耦，消息的发送者无需知道消息使用者的存在，反之亦然。<br>AMQP的主要特征是面向消息、队列、路由（包括点对点和发布/订阅）、可靠性、安全。<br>RabbitMQ是一个开源的AMQP实现，服务器端用Erlang语言编写，支持多种客户端，<br>如：Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等，支持AJAX。<br>用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。</p>
+<p>个人想到最常用的高并发场景可能是秒杀，这里自己做了一个简单的demo，进行了实践。</p>
+<h3 id="项目地址-rabbitmq秒杀实践"><a href="#项目地址-rabbitmq秒杀实践" class="headerlink" title="项目地址: rabbitmq秒杀实践"></a>项目地址: <a href="https://github.com/sonake/seconds-kill-demo" target="_blank" rel="noopener">rabbitmq秒杀实践</a></h3><h3 id="第一步-新建springboot项目，引入依赖-增加库表"><a href="#第一步-新建springboot项目，引入依赖-增加库表" class="headerlink" title="第一步: 新建springboot项目，引入依赖,增加库表"></a>第一步: 新建springboot项目，引入依赖,增加库表</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--redis--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--消息队列--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-amqp<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.baomidou<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-plus-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里springboot的版本为2.2.0，持久层选择mybatis-plus,消息队列配合redis实现高并发场景下的削峰，主要是redis有优秀的读写速度，可以快速处理请求，将请求结果处理后，返回用户，通过消息队列暂存结果，监听队列，程序持久化结果到数据库。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Navicat MariaDB Data Transfer</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Source Server         : localhost</span></span><br><span class="line"><span class="comment">Source Server Version : 100214</span></span><br><span class="line"><span class="comment">Source Host           : localhost:3308</span></span><br><span class="line"><span class="comment">Source Database       : seconds_kill</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Target Server Type    : MariaDB</span></span><br><span class="line"><span class="comment">Target Server Version : 100214</span></span><br><span class="line"><span class="comment">File Encoding         : 65001</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Date: 2019-12-26 18:30:26</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span> FOREIGN_KEY_CHECKS=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ----------------------------</span></span><br><span class="line"><span class="comment">-- Table structure for goods</span></span><br><span class="line"><span class="comment">-- ----------------------------</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`goods`</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`goods`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'主键'</span>,</span><br><span class="line">  <span class="string">`goods_name`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品名称'</span>,</span><br><span class="line">  <span class="string">`store`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'价格'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">3</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ----------------------------</span></span><br><span class="line"><span class="comment">-- Records of goods</span></span><br><span class="line"><span class="comment">-- ----------------------------</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`goods`</span> <span class="keyword">VALUES</span> (<span class="string">'1'</span>, <span class="string">'watch'</span>, <span class="string">'150'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`goods`</span> <span class="keyword">VALUES</span> (<span class="string">'2'</span>, <span class="string">'pencil'</span>, <span class="string">'150'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ----------------------------</span></span><br><span class="line"><span class="comment">-- Table structure for orders</span></span><br><span class="line"><span class="comment">-- ----------------------------</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`orders`</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`orders`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`order_name`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`order_user`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">36956</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8mb4;</span><br></pre></td></tr></table></figure>
+<p>orders订单表id，考虑到实际业务，订单id必须唯一，使用mybatis-plus的分布式全局唯一id</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sonake.seconds.kill.demo.domain;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.baomidou.mybatisplus.annotation.IdType;</span><br><span class="line"><span class="keyword">import</span> com.baomidou.mybatisplus.annotation.TableId;</span><br><span class="line"><span class="keyword">import</span> com.baomidou.mybatisplus.annotation.TableName;</span><br><span class="line"><span class="keyword">import</span> lombok.Data;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ：xzyuan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> ：Created in 2019/12/26 13:42</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>：</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span>:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@TableName</span>(<span class="string">"orders"</span>)</span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Orders</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TableId</span>(type = IdType.ID_WORKER_STR)</span><br><span class="line">    <span class="keyword">private</span> String id;</span><br><span class="line">    <span class="keyword">private</span> String orderName;</span><br><span class="line">    <span class="keyword">private</span> String orderUser;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="第二步：添加配置"><a href="#第二步：添加配置" class="headerlink" title="第二步：添加配置"></a>第二步：添加配置</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">seconds_kill</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">jdbc:mysql://127.0.0.1:3308/seconds_kill?rewriteBatchedStatements=true&amp;serverTimezone=GMT%2b8</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">driver-class-name:</span> <span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line">    <span class="attr">hikari:</span></span><br><span class="line">      <span class="attr">connection-timeout:</span> <span class="number">30000</span></span><br><span class="line">      <span class="attr">max-lifetime:</span> <span class="number">1800000</span></span><br><span class="line">      <span class="attr">max-pool-size:</span> <span class="number">15</span></span><br><span class="line">      <span class="attr">min-idle:</span> <span class="number">200</span></span><br><span class="line">      <span class="attr">connection-test-query:</span> <span class="string">select</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">virtual-host:</span> <span class="string">/</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">localhost</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">guest</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">guest</span></span><br><span class="line">    <span class="attr">listener:</span></span><br><span class="line">      <span class="attr">simple:</span></span><br><span class="line">        <span class="attr">retry:</span></span><br><span class="line">          <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">max-attempts:</span> <span class="number">10</span> <span class="comment">#最大重试次数</span></span><br><span class="line">          <span class="attr">max-interval:</span> <span class="number">10000</span> <span class="comment">#重试最大时间间隔(ms)</span></span><br><span class="line">          <span class="attr">initial-interval:</span> <span class="comment">#c重试间隔时间(ms)</span></span><br><span class="line">          <span class="attr">multiplier:</span> <span class="number">5</span> <span class="comment">#应用于前一重试间隔的乘法器。</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">localhost</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">6379</span></span><br><span class="line">    <span class="attr">jedis:</span></span><br><span class="line">      <span class="attr">pool:</span></span><br><span class="line">        <span class="attr">max-active:</span> <span class="number">1024</span></span><br><span class="line">        <span class="attr">max-wait:</span> <span class="string">-1ms</span></span><br><span class="line">        <span class="attr">max-idle:</span> <span class="number">200</span></span><br><span class="line">    <span class="attr">database:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<h3 id="第三步：代码实现"><a href="#第三步：代码实现" class="headerlink" title="第三步：代码实现"></a>第三步：代码实现</h3><p>这里主要说一下与消息队列主要的代码，数据库常用的crud不做展示，具体可看项目demo</p>
+<ol>
+<li>rabbitmq的配置,有关rabbitmq的参数可以自行百度，<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sonake.seconds.kill.demo.config;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.core.*;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.support.converter.MessageConverter;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ：xzyuan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> ：Created in 2019/12/26 14:19</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>：</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span>:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RabbitMQConfig</span> </span>&#123;</span><br><span class="line">    <span class="comment">//库存交换机</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String STORY_EXCHANGE = <span class="string">"STORY_EXCHANGE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//订单交换机</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String ORDER_EXCHANGE = <span class="string">"ORDER_EXCHANGE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//库存队列</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String STORY_QUEUE = <span class="string">"STORY_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//订单队列</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String ORDER_QUEUE = <span class="string">"ORDER_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//库存路由键</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String STORY_ROUTING_KEY = <span class="string">"STORY_ROUTING_KEY"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//订单路由键</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String ORDER_ROUTING_KEY = <span class="string">"ORDER_ROUTING_KEY"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> MessageConverter <span class="title">messageConverter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Jackson2JsonMessageConverter();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建库存交换机</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Exchange <span class="title">getStoryExchange</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ExchangeBuilder.directExchange(STORY_EXCHANGE).durable(<span class="keyword">true</span>).build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建库存队列</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Queue <span class="title">getStoryQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Queue(STORY_QUEUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//库存交换机和库存队列绑定</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Binding <span class="title">bindStory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> BindingBuilder.bind(getStoryQueue()).to(getStoryExchange()).with(STORY_ROUTING_KEY).noargs();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建订单队列</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Queue <span class="title">getOrderQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Queue(ORDER_QUEUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建订单交换机</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Exchange <span class="title">getOrderExchange</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ExchangeBuilder.directExchange(ORDER_EXCHANGE).durable(<span class="keyword">true</span>).build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//订单队列与订单交换机进行绑定</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Binding <span class="title">bindOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> BindingBuilder.bind(getOrderQueue()).to(getOrderExchange()).with(ORDER_ROUTING_KEY).noargs();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>库存初始化至redis</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>在开发中可能会有这样的情景。需要在容器启动的时候执行一些内容。比如读取配置文件，数据库连接之类的。<br>SpringBoot给我们提供了两个接口来帮助我们实现这种需求。这两个接口分别为CommandLineRunner和ApplicationRunner。<br>他们的执行时机为容器启动完成的时候。这里选用ApplicationRunner。</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sonake.seconds.kill.demo.runner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.domain.Goods;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.service.GoodsService;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.service.RedisService;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.ApplicationArguments;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.ApplicationRunner;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ：xzyuan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> ：Created in 2019/12/26 11:39</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>：项目启动数据初始化</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span>: 1.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationStartupRunner</span> <span class="keyword">implements</span> <span class="title">ApplicationRunner</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> GoodsService goodsService;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedisService redisService;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(ApplicationArguments args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        List&lt;Goods&gt; list = goodsService.list();</span><br><span class="line">        list.forEach(goods -&gt; &#123;</span><br><span class="line">            redisService.put(goods.getGoodsName(),goods.getStore(),<span class="number">20</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">        log.info(<span class="string">"商品库存初始化至redis完毕"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果如图： </p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="redis持久化.png" alt="redis持久化.png" title="">
+                </div>
+                <div class="image-caption">redis持久化.png</div>
+            </figure>
+
+<ol start="2">
+<li>秒杀请求发起</li>
+</ol>
+<p>在这里主要写了两个请求，主要作用见注释.<br>在使用redis+rebbitmq实现秒杀这个接口里，并没有针对数据库的操作，是针对redis做了数据增减，然后将下单结果告知rabbitmq并实现了暂存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sonake.seconds.kill.demo.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.config.RabbitMQConfig;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.domain.Orders;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.service.GoodsService;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.service.OrderService;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.service.RedisService;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.rabbit.core.RabbitTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ：xzyuan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> ：Created in 2019/12/26 14:22</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>：</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span>:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SecController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RabbitTemplate rabbitTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedisService redisService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> GoodsService goodsService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用redis+消息队列进行秒杀实现</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> username</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> goodsName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/sec"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sec</span><span class="params">(@RequestParam(value = <span class="string">"username"</span>)</span> String username, @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"goodsName"</span>)</span> String goodsName) </span>&#123;</span><br><span class="line">        log.info(<span class="string">"参加秒杀的用户是：&#123;&#125;，秒杀的商品是：&#123;&#125;"</span>, username, goodsName);</span><br><span class="line">        String message = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">//调用redis给相应商品库存量减一</span></span><br><span class="line">        Long decrByResult = redisService.decrBy(goodsName);</span><br><span class="line">        <span class="keyword">if</span> (decrByResult &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 说明该商品的库存量有剩余，可以进行下订单操作</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            log.info(<span class="string">"用户：&#123;&#125;秒杀该商品：剩余&#123;&#125;库存，可以进行下订单操作"</span>, username, decrByResult, goodsName);</span><br><span class="line">            <span class="comment">//发消息给库存消息队列，将库存数据减一</span></span><br><span class="line">            rabbitTemplate.convertAndSend(RabbitMQConfig.STORY_EXCHANGE, RabbitMQConfig.STORY_ROUTING_KEY, goodsName);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//发消息给订单消息队列，创建订单</span></span><br><span class="line">            Orders orders = <span class="keyword">new</span> Orders();</span><br><span class="line">            orders.setOrderName(goodsName);</span><br><span class="line">            orders.setOrderUser(username);</span><br><span class="line">            rabbitTemplate.convertAndSend(RabbitMQConfig.ORDER_EXCHANGE, RabbitMQConfig.ORDER_ROUTING_KEY, orders);</span><br><span class="line">            message = <span class="string">"用户"</span> + username + <span class="string">"秒杀"</span> + goodsName + <span class="string">"成功"</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 说明该商品的库存量没有剩余，直接返回秒杀失败的消息给用户</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            log.info(<span class="string">"用户：&#123;&#125;秒杀时商品的库存量没有剩余,秒杀结束"</span>, username);</span><br><span class="line">            message = username + <span class="string">"商品的库存量没有剩余,秒杀结束"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实现纯数据库操作实现秒杀操作</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> username</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> goodsName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/secDataBase"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">secDataBase</span><span class="params">(@RequestParam(value = <span class="string">"username"</span>)</span> String username, @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"goodsName"</span>)</span> String goodsName) </span>&#123;</span><br><span class="line">        log.info(<span class="string">"参加秒杀的用户是：&#123;&#125;，秒杀的商品是：&#123;&#125;"</span>, username, goodsName);</span><br><span class="line">        <span class="keyword">return</span> goodsService.secData(username,goodsName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>消息队列的监听并消费<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sonake.seconds.kill.demo.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.config.RabbitMQConfig;</span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.domain.Orders;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.rabbit.annotation.RabbitListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ：xzyuan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> ：Created in 2019/12/26 14:49</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>：订单监听</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span>:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MQOrderService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 监听订单消息队列，并消费</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> orders</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RabbitListener</span>(queues = RabbitMQConfig.ORDER_QUEUE)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createOrder</span><span class="params">(Orders orders)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"收到订单消息，订单用户为：&#123;&#125;，商品名称为：&#123;&#125;"</span>, orders.getOrderUser(), orders.getOrderName());</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 调用数据库orderService创建订单信息</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="comment">//int s =Integer.valueOf("ssss");</span></span><br><span class="line">        orderService.save(orders);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sonake.seconds.kill.demo.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sonake.seconds.kill.demo.config.RabbitMQConfig;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.rabbit.annotation.RabbitListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> ：xzyuan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> ：Created in 2019/12/26 14:47</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>：</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span>:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MQStoreService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> GoodsService goodsService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 监听库存消息队列，并消费</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> goodsName</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RabbitListener</span>(queues = RabbitMQConfig.STORY_QUEUE)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">decrByStock</span><span class="params">(String goodsName)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"库存消息队列收到的消息商品信息是：&#123;&#125;"</span>, goodsName);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 调用数据库service给数据库对应商品库存减一</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="comment">//int s =Integer.valueOf("ssss");</span></span><br><span class="line">        goodsService.decrByStore(goodsName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><h3 id="利用压测工具jmeter模拟秒杀"><a href="#利用压测工具jmeter模拟秒杀" class="headerlink" title="利用压测工具jmeter模拟秒杀."></a>利用压测工具jmeter模拟秒杀.</h3><p><a href="https://www.apache.org/dist/jmeter/binaries/" target="_blank" rel="noopener">点我下载</a>,注意与jdk的版本对应关系</p>
+<p>模拟300个用户秒杀</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="jmeter截图1.png" alt="jmeter截图1.png" title="">
+                </div>
+                <div class="image-caption">jmeter截图1.png</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="jmeter截图2.png" alt="jmeter截图2.png" title="">
+                </div>
+                <div class="image-caption">jmeter截图2.png</div>
+            </figure>
+
+<p>点击请求，发起秒杀<br>用户收到的秒杀结果</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="jmeter3.png" alt="jmeter3.png" title="">
+                </div>
+                <div class="image-caption">jmeter3.png</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="jmeter4.png" alt="jmeter4.png" title="">
+                </div>
+                <div class="image-caption">jmeter4.png</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="jmeter5.png" alt="jmeter5.png" title="">
+                </div>
+                <div class="image-caption">jmeter5.png</div>
+            </figure>
+<p>可以看到：有的用户秒杀成功，有的失败，因为初始化的商品库存共计200件，这里模拟300用户下单，故有100用户秒杀失败<br>消息队列接收到的数据</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="rabbitmq1.png" alt="rabbitmq1.png" title="">
+                </div>
+                <div class="image-caption">rabbitmq1.png</div>
+            </figure>
+<p>客户端监听消息队列并进行消费</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="rabbitmq2.png" alt="rabbitmq2.png" title="">
+                </div>
+                <div class="image-caption">rabbitmq2.png</div>
+            </figure>
+
+<h3 id="纯数据库秒杀"><a href="#纯数据库秒杀" class="headerlink" title="纯数据库秒杀"></a>纯数据库秒杀</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="数据库秒杀1.png" alt="数据库秒杀1.png" title="">
+                </div>
+                <div class="image-caption">数据库秒杀1.png</div>
+            </figure>
+
+<p>可以发现，由于并发的操作，导致多个请求进来的时候读取的商品库存量都是一样的</p>
+<p>数据库结果</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="数据库秒杀2.png" alt="数据库秒杀2.png" title="">
+                </div>
+                <div class="image-caption">数据库秒杀2.png</div>
+            </figure>
+<p>我设置了20用户秒杀，下单都成功了，但是数据库库存只少了6个.<br>可以看出，由于并发的情况，导致订单超卖，所有用户都已经下单成功了，并且数据库中的库存也并未归零（随着并发量的增多，数据库中的库存会为0 ，但是会有更多的用户下单成功，也会有用户下单失败，秒杀结束</p>
+<p>至此，这里使用了redis+rabbitmq实现了高并发秒杀场景，并有效的防止了超卖现象，同时听过使用纯数据库操作产生了超卖的现象。</p>
+<blockquote>
+<blockquote>
+<p>另外，由于考虑实际场景，rabbitmq万一挂掉我们的消息也就丢失了，为了防止此类情况，可设置消息队列的持久化或者集群，有效避免此类情况，这里没有做展示，感兴趣的可自行百度。<br>配置文件中rabbitmq有关重试的设置,在设置了重试次数以后，若还是没有尝试成功，消息就会被丢弃，客户端也无法获取消息，默认是一直尝试的，此处可设置手动ack的确认，处理异常，<br>并进行相关的的消息补偿等，详情百度。</p>
+</blockquote>
+</blockquote>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    Last updated: <time datetime="2021-10-26T01:54:52.360Z" itemprop="dateUpdated">2021-10-26 01:54:52</time>
+</span><br>
+
+
+        
+        MIT License Copyright (c) 2019 xzyuan
+        
+    </div>
+    
+    <footer>
+        <a href="sonake.github.io">
+            <img src="/img/head.JPG" alt="sonake">
+            sonake
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/" rel="tag">rabbitmq</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%A7%92%E6%9D%80/" rel="tag">秒杀</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/&title=《rabbitmq简单实践》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/&title=《rabbitmq简单实践》 — Sonake&source=简介AMQP，即Advanced Message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《rabbitmq简单实践》 — Sonake&url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/10/25/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95-%E4%B8%89/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据结构与算法(三)</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/12/17/netty%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">netty学习笔记(一)</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "2KrcWzJTj3SXESRPeMJAQudH-gzGzoHsz",
+            appKey: "uElsPl2LhgVn4yS8wNK4a6kC",
+            avatar: "mm",
+            placeholder: "大佬请讲",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/weixin.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/weixin.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>This blog is licensed under a <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>sonake &copy; 2016 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/&title=《rabbitmq简单实践》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/&title=《rabbitmq简单实践》 — Sonake&source=简介AMQP，即Advanced Message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《rabbitmq简单实践》 — Sonake&url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/12/27/rabbitmq%E7%AE%80%E5%8D%95%E5%AE%9E%E8%B7%B5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuElEQVR42u3awW7bQAwE0Pz/T7tATy0CuTPkbpICTydDdiQ9HXaZIT8+4uP1+3j6/Ofx+fzT1T5/254/duDh4eGNHv3pyBnJdT6/oKcz7Wt9fAV4eHh413j5pZNFPFmlE0DyV/+4Ox4eHt638vISOS+C2y0HDw8P7//lzYKDTWyBh4eH99N4+UI8W8ST1zF7hmNZCx4eHl7M2zfAvv7zl/b38PDw8MpFOVl228U9Hzh4LQ48PDy8G7x8iGo2epWHC7PYIgop8PDw8C7wNgVuW/7uX98wjMDDw8M7xGsbUbOxqlODCPnd8fDw8G7zNrd5z2gbV0mJXJTyeHh4eJd5eet9H87O4oz6Cnh4eHjXeMlgaF7mtq8p36ii4dT2/eHh4eGVvNmQ02akYBM6XGx94eHh4ZW8zcbQjk/lRflsnS+CCTw8PLwRb3b7fJPIF/r2vhEbDw8P7wIv+cc+ISXgfPPIy+XiReDh4eEd5bVtsFObwWz7GW4JeHh4eJd5s5BiMwqwacVFKTUeHh7eId6pmHXDmF1nOBmBh4eHd4i3D2fb0vlUSV309PDw8PAO8dow9/DCvRj5attjeHh4ePd4eWjbBhOnSudhmIuHh4d3iNeGETcW6HxQoC7H8fDw8C7z2jP75lbCS0r8qAGGh4eHd4iXhxH7cYF8OKANIAokHh4e3pr3/nHz3+QP124es4GGv8IIPDw8vKO8TUCQP8RsUOBinIGHh4e34L3KI7l03rhqz+RDYFHvDg8PD2/EaxffJJ7Ybx552b1vv+Hh4eHNeJuxqmTzuLEJFYNZeHh4eNd4m7ZTsp0UD3QoksDDw8P7abz897Ooty2gH7cNPDw8vG/lnY0SNjFuvsHg4eHh3eO1S3m+fO9/024/q6wFDw8Pb5K41uVyMpiVD0ttBhEOjA7g4eHhvbvaL2aWiL37meBWAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '我又出来了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!我又进去了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

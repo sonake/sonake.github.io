@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>讨论下时下很热门的容器部署,先来安装docker | Sonake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="docker,centos">
+    <meta name="description" content="如果没有服务器的同学可以自助机安装一个虚拟机我这里是在自己的电脑上安装的虚拟机，系统版本是centos Linux release 7.6.1810(Core)为了避免一些其他错误，请切换至根用户下操作">
+<meta property="og:type" content="article">
+<meta property="og:title" content="讨论下时下很热门的容器部署,先来安装docker">
+<meta property="og:url" content="sonake.github.io&#x2F;2019&#x2F;10&#x2F;20&#x2F;centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85&#x2F;index.html">
+<meta property="og:site_name" content="Sonake">
+<meta property="og:description" content="如果没有服务器的同学可以自助机安装一个虚拟机我这里是在自己的电脑上安装的虚拟机，系统版本是centos Linux release 7.6.1810(Core)为了避免一些其他错误，请切换至根用户下操作">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-10-20T10:56:37.000Z">
+<meta property="article:modified_time" content="2021-10-26T01:54:52.360Z">
+<meta property="article:author" content="sonake">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="centos">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="Sonake" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.1.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.JPG">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">sonake</h5>
+          <a href="mailto:y760946378@gmail.com" title="y760946378@gmail.com" class="mail">y760946378@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                时光轴
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/sonake" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://me.csdn.net/qq_41609874" target="_blank" >
+                <i class="icon icon-lg icon-bookmark"></i>
+                CSDN
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/friends"  >
+                <i class="icon icon-lg icon-unlink"></i>
+                友链
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/user" target="_blank" >
+                <i class="icon icon-lg icon-user"></i>
+                关于我
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">讨论下时下很热门的容器部署,先来安装docker</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="Search">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">讨论下时下很热门的容器部署,先来安装docker</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-10-20T10:56:37.000Z" itemprop="datePublished" class="page-time">
+  2019-10-20
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-centos7上面docker的安装"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">讨论下时下很热门的容器部署,先来安装docker</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-20 10:56:37" datetime="2019-10-20T10:56:37.000Z"  itemprop="datePublished">2019-10-20</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>如果没有服务器的同学可以自助机安装一个虚拟机<br>我这里是在自己的电脑上安装的虚拟机，系统版本是<br>centos Linux release 7.6.1810(Core)<br>为了避免一些其他错误，请切换至根用户下操作</p>
+<a id="more"></a>
+
+<p>第一步：<br>    卸载已安装的docker：yum remove docker-*<br>第二步：<br>    更新系统内核：yum update<br>第三步：<br>    安装docker：yum install docker<br>第四步：<br>    启动docker：systemctl start docker<br>第五步：<br>    查看容器：docker ps<br>第六步：<br>    添加阿里云的镜像加速地址：vim /etc/docker/daemon.json<br>    添加内容：{“registry-mirrors”: <a href=""https://aiyf7r3a.mirror.aliyuncs.com"">“https://aiyf7r3a.mirror.aliyuncs.com”</a>}<br>第七步：<br>    重启docker：systemctl restart docker</p>
+<p>至此docker安装完毕！</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    Last updated: <time datetime="2021-10-26T01:54:52.360Z" itemprop="dateUpdated">2021-10-26 01:54:52</time>
+</span><br>
+
+
+        
+        MIT License Copyright (c) 2019 xzyuan
+        
+    </div>
+    
+    <footer>
+        <a href="sonake.github.io">
+            <img src="/img/head.JPG" alt="sonake">
+            sonake
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/" rel="tag">centos</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/" rel="tag">docker</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/&title=《讨论下时下很热门的容器部署,先来安装docker》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/&title=《讨论下时下很热门的容器部署,先来安装docker》 — Sonake&source=如果没有服务器的同学可以自助机安装一个虚拟机我这里是在自己的电脑上安装的虚拟机，系统版本是centos Linux release 7.6.1810(Co..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《讨论下时下很热门的容器部署,先来安装docker》 — Sonake&url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/11/13/mysql%E7%AC%94%E8%AE%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">记录一些mysql的笔记</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/10/18/hello-world/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Hello World</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "2KrcWzJTj3SXESRPeMJAQudH-gzGzoHsz",
+            appKey: "uElsPl2LhgVn4yS8wNK4a6kC",
+            avatar: "mm",
+            placeholder: "大佬请讲",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/weixin.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/weixin.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>This blog is licensed under a <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>sonake &copy; 2016 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/&title=《讨论下时下很热门的容器部署,先来安装docker》 — Sonake&pic=sonake.github.io/img/head.JPG" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/&title=《讨论下时下很热门的容器部署,先来安装docker》 — Sonake&source=如果没有服务器的同学可以自助机安装一个虚拟机我这里是在自己的电脑上安装的虚拟机，系统版本是centos Linux release 7.6.1810(Co..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《讨论下时下很热门的容器部署,先来安装docker》 — Sonake&url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/&via=sonake.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=sonake.github.io/2019/10/20/centos7%E4%B8%8A%E9%9D%A2docker%E7%9A%84%E5%AE%89%E8%A3%85/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADL0lEQVR42u3awU7kQAwEUP7/p9krEky2yh2kiXk5oSEk/XoOpsv++Iivzy/X90++X1/vuX7m9fNf3Z98fsOFjY2N/RB2DkiuV/ff9c1cPzNZGzY2NvZWdltg2upwvaz8jdefFEUOGxsb+8+z86NCW35aJDY2Njb2SQG7/nc/RybPmW0cNjY29t9hzw4JOfV6QQlsducNWRo2Njb227PzkOj9f/6V/jY2Njb2G7M/R1e+QdeFqm0t3KXAxsbG3sSeRf9JtDQb2cnjpBsGd7CxsbFXsNu4Z1a62igqKZz5oM8PP2NjY2MvYreB/uwFeayfHzNOGg/Y2NjYm9hto3SGOSmB7dujlWBjY2OvY896o21jOD9anIwTRavFxsbGXso+L2YnpSgPs/J1vvwysLGxsRex8+KUlK6TZOsk7m/bydjY2Nib2O2IzL3jle1K8kZv1B7AxsbGXsHOqW08dNI2mG1x8iVhY2Nj72O3gDxjnw3c5GvID0Uv2wPY2NjYK9iz4tS2ctumbNu0yCMzbGxs7H3sWUsgX3o9TDPamvowg42Njb2Ofd6ynY3OzLZm9uSXKRo2Njb2OnbbcJ2VsfPidBR4YWNjY69jz+KkJNDJh4Fm783/9j+NXmxsbOzHstui1VLzv2qbvnmoVERL2NjY2I9l33XkaKOfhJ3fmW8fNjY29j72SUz/Mbo+R1fe0oi2GxsbG3sFuy0Dw/gmLpNJGZsVzpdxEjY2NvbD2efN3eulzLbjpNlQBFXY2NjYi9ht3tIuqK0aOSkJuYq2NDY2NvYD2bPw/bcXfVdoVfwaGxsb+7Hs9sAwayfk9//GAGg0rIONjY39WHay0HwgJh+OPC+B7RN+aPRiY2Njr2Dnh4F2a2bRf4s8ibewsbGxd7Bn44/JcSIvSOfDl/UQDzY2NvYidhu459HPrDXbgq8LVf7lYWNjYz+d3b4yv2c2yjNrP9etYmxsbOx17JPYfbah925r8nZsbGxs7NnIzqwlfN54wMbGxsY+WWiOz5u1szfedhTBxsbGfnt227I9CnQOxnHadw0Hd7CxsbEfxZ4tqH1EUiZnrYL2EIWNjY29iP0Pi5foTNpdbWoAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '我又出来了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!我又进去了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
